@@ -1,0 +1,164 @@
+
+
+Prado_sim2 = function(Nsim, Pvar, Dfactor, tvcov,flag_ASE=1, flag_DW=0)
+{
+tt = proc.time()
+
+np = 0
+
+## MS bic   2  aic 5  995
+##### simulate a bivariate series of N
+N = 300
+K = 20
+p0 = 1
+r1 = 0.7+0.2*1:N/299
+r2 = -0.9+0.2*1:N/299
+A0 = array(0,c(1,K,K,N))
+for (i in 1:10)
+      A0[1,i,i,] = r1
+for (i in 11:20)
+      A0[1,i,i,] = r2
+A0[1,1,5,] = 0.9
+A0[1,2,15,] = 0.9
+A0[1,6,12,] = -0.9
+A0[1,15,20,] = -0.9
+
+S0 = array(0,c(K,K,N))
+for (j in 1:K) S0[j,j,] = 0.1
+#############  true spectrum
+if (flag_ASE == 1){
+  times <- 1:N
+  freqs <- c(0,seq(0,0.49,by=0.01)+0.001,0.5)
+  tspec <- tvar_spec_Guo(A0, S0, times, freqs)
+  tch = abs(tspec[1,2,,])^2/(abs(tspec[1,1,,])*abs(tspec[2,2,,]))
+}
+
+
+
+P_sel = rep(0,Nsim)
+P_DW = array(0,c(Nsim,2))
+
+ASE1 = rep(0,Nsim)
+ASE2 = rep(0,Nsim)
+CH   = rep(0,Nsim)
+SP1 = array(0,c(52,298))
+SP2 = array(0,c(52,298))
+SP8 = array(0,c(52,298))
+SP15 = array(0,c(52,298))
+Ch1 = array(0,c(52,298))
+Ch2 = array(0,c(52,298))
+Ch3 = array(0,c(52,298))
+Ch4 = array(0,c(52,298))
+
+A_m = array(0,c(Pvar,K,K,N,Nsim))
+S_m = array(0,c(K,K,N,Nsim))
+
+Dfactors = array(0,c(Nsim,Pvar*K + K -1,K*2))
+
+for (iter in 1:Nsim){   
+
+X = array(0,c(N+1,K))
+X[1,] = rnorm(K)
+for (n in 1:N)
+  X[n+1,] =  A0[1,,,n]%*%X[n,]+ sqrt(0.1)*rnorm(K)
+
+X = X[p0+(1:N),]
+
+signal = 1:(K*N)
+for (i in 1:K)   signal[idx(i,K,N)] = X[,i]
+
+
+tvarp <- MBayesLattice(signal, K, Pvar, Dfactor , np,0,tvcov,0,0)
+Dfactors[iter,,] = tvarp$Dfactors
+#################### Model selection ###############
+MSresult = array(0,c(Pvar,3))
+for(pvar in 1:Pvar){
+  para = cpara(tvarp$coefs,tvarp$s2,pvar)
+  MSresult[pvar,] = MS(signal,para$A,para$S)[[1]]
+}
+P_sel[iter] = which(MSresult[,3] == min(MSresult[,3]))
+
+  para = cpara(tvarp$coefs,tvarp$s2,P_sel[iter])
+  A_m[,,,,iter] =  para$A
+  S_m[,,,iter] =  para$S
+
+if(flag_DW == 1){
+ns = 20
+lD = rep(0,Pvar)
+pDIC = rep(0,Pvar)
+DIC = rep(0,Pvar)
+llikw = rep(0,Pvar)
+WAIC = rep(0,Pvar)
+
+likes = array(0,c(Pvar,ns,N))
+for (j in 1:ns){
+
+  tvarpdim = dim(tvarp$coefs)
+  tvarpN = prod(tvarpdim)
+  coefsp = array(rnorm(tvarpN,tvarp$coefs[1:tvarpN], sqrt(tvarp$coefsC[1:tvarpN])) ,tvarpdim)
+ # coefsp = array(rnorm(tvarpN,tvarp$coefs[1:tvarpN], apply(rbind(sqrt(tvarp$coefsC[1:tvarpN]),rep(1,tvarpN)),2,min)) ,tvarpdim)
+  s2sp = array(1/rgamma(prod(dim(tvarp$s2)),tvarp$n/2,tvarp$s2*tvarp$n/2),dim(tvarp$s2))
+  for (pvar in 1:Pvar){
+    para = cpara(coefsp,s2sp,pvar)
+    ms = MS(signal,para$A,para$S)
+    lD[pvar] = lD[pvar] + ms[[1]][1]
+    likes[pvar,j,] = likes[pvar,j,] + ms[[2]]
+  }
+}
+lD = lD/ns
+likes = likes/ns
+
+
+for (pvar in 1:Pvar){
+  pDIC[pvar] = 2*(MSresult[pvar,1]-lD[pvar])
+  DIC[pvar] = -2*MSresult[pvar,1] +2*pDIC[pvar]
+
+  llikw[pvar] = sum(log(apply(likes[pvar,,(1+pvar):(N-pvar)],2,mean)))
+  WAIC[pvar] = 2*llikw[pvar] - 2*lD[pvar]
+
+}
+
+P_DW[iter,1] = which(DIC == min(DIC))
+P_DW[iter,2] = which(WAIC == min(WAIC))
+}
+
+
+if(flag_ASE == 1){
+
+  para = cpara(tvarp$coefs,tvarp$s2,P_sel[iter])
+  #A_m[,,,,iter] =  para$A
+  #S_m[,,,iter] =  para$S
+
+  spec <- tvar_spec_Guo(para$A, para$S, 1:N, freqs)
+  TT = 2:299
+  sp1 = log(abs(spec[1,1,,TT]))
+  sp2 = log(abs(spec[2,2,,TT]))
+  sp8 = log(abs(spec[8,8,,TT]))
+  sp15 = log(abs(spec[15,15,,TT]))
+  ch1 = abs(spec[1,5,,TT])^2/(abs(spec[1,1,,TT])*abs(spec[5,5,,TT]))
+  ch2 = abs(spec[2,15,,TT])^2/(abs(spec[2,2,,TT])*abs(spec[15,15,,TT]))
+  ch3 = abs(spec[5,12,,TT])^2/(abs(spec[5,5,,TT])*abs(spec[12,12,,TT]))
+  ch4 = abs(spec[15,20,,TT])^2/(abs(spec[15,15,,TT])*abs(spec[20,20,,TT]))
+  SP1 = SP1 + sp1
+  SP2 = SP2 + sp2
+  SP8 = SP8 + sp8
+  SP15 = SP15 + sp15
+
+  Ch1 = Ch1 + ch1
+  Ch2 = Ch2 + ch2
+  Ch3 = Ch3 + ch3
+  Ch4 = Ch4 + ch4
+
+  ASE1[iter] = mean( (   sp1 -log(abs(tspec[1,1,,TT]))   )^2 )
+  ASE2[iter] = mean( (   sp2 -log(abs(tspec[2,2,,TT]))   )^2 )
+  CH[iter]   =  mean((ch - tch[,TT])^2)
+}
+  print(iter)
+}
+print(proc.time()-tt)
+ASEtable = cbind(ASE1,ASE2,CH)
+ASE = rbind(c(mean(ASE1),sd(ASE1)),c(mean(ASE2),sd(ASE2)),c(mean(CH),sd(CH)))
+return(list('ASE'=ASE,'ASEtable'=ASEtable,'A0'=A0,'S0'=S0,'A_m'=A_m,'S_m'=S_m,'Dfactors'=Dfactors,
+     'P_sel'=P_sel,'P_DW'=P_DW,'SP1'=SP1/Nsim,'SP2'=SP2/Nsim,'SP8'=SP8/Nsim,
+     'SP15'=SP15/Nsim,'Ch1'=Ch1/Nsim,'Ch2'=Ch2/Nsim,'Ch3'=Ch3/Nsim,'Ch4'=Ch4/Nsim))
+}
