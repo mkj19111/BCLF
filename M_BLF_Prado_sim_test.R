@@ -1,16 +1,16 @@
 
-
-
-setwd('D:/research/Current/Bayesian_lattice')
 rm(list = ls())
+
+# load packages
 library("fields")
 library("mvtnorm")
 
-source("utility.r")
-source("MBayesLattice.r")
-source("MdynamicLik.r")
-source("tvar_spec_Guo.r")
-source("Prado_sim1.r")
+# load R functions
+source("./Bayesian_lattice/utility.r")
+source("./Bayesian_lattice/MBayesLattice.r")
+source("./Bayesian_lattice/MdynamicLik.r")
+source("./Bayesian_lattice/tvar_spec_Guo.r")
+source("./Bayesian_lattice/Prado_sim1.r")
 
 
 Dfactor = c(0.990,1,0.001)

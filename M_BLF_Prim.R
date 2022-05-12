@@ -1,21 +1,22 @@
 
-
-setwd('D:/research/Current/Bayesian_lattice')
 rm(list = ls())
-library("fields")
-library(mvtnorm)
-idx = function(k,K,N){ return(K*1:N-K+k) }
 
-source("utility.r")
-source("BayesLatticeLik_M.r")
-source("BayesLattice_M.r")
-source("dynamicLik.r")
-source("tvar_spec.r")
-source("tvar_spec_Guo.r")
+# load packages
+library("fields")
+library("mvtnorm")
+
+# load R functions
+source("./Bayesian_lattice/utility.r")
+source("./Bayesian_lattice/BayesLatticeLik_M.r")
+source("./Bayesian_lattice/BayesLattice_M.r")
+source("./Bayesian_lattice/dynamicLik.r")
+source("./Bayesian_lattice/tvar_spec.r")
+source("./Bayesian_lattice/tvar_spec_Guo.r")
 
 source("MBayesLattice.r")
 source("MdynamicLik.r")
 
+idx = function(k,K,N){ return(K*1:N-K+k) }
 
 
 ##########

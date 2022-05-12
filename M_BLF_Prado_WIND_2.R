@@ -1,16 +1,18 @@
 
 
-setwd('D:/research/Current/Bayesian_lattice')
 rm(list = ls())
+
+# load packages
 library("fields")
 library("expm")
-library(mvtnorm)
+library("mvtnorm")
 
-source("utility.r")
-#source("BayesLatticeLik_P.r")
-source("MBayesLattice.r")
-source("MdynamicLik.r")
-source("tvar_spec_Guo.r")
+# load R functions
+source("./Bayesian_lattice/utility.r")
+#source("./Bayesian_lattice/BayesLatticeLik_P.r")
+source("./Bayesian_lattice/MBayesLattice.r")
+source("./Bayesian_lattice/MdynamicLik.r")
+source("./Bayesian_lattice/tvar_spec_Guo.r")
 
 
 ## transformation from direction and speed to X,Y component
