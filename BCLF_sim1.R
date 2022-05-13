@@ -5,7 +5,7 @@ rm(list = ls())
 library("fields")
 library("mvtnorm")
 
-setwd('D:/Git/BCLF/')
+setwd('D:/Git/BCLF')   # Please specify the working directory
 
 # load R functions
 source("./Bayesian_lattice/utility.r")
@@ -17,14 +17,14 @@ source("./Bayesian_lattice/sim1.r")
 
 Dfactor = c(0.990,1,0.001)
 set.seed(20000)
-result=sim1(1,1,Nsim=5,Dfactor,tvcov=1,flag_ASE=1,flag_DW=0)
+result=sim1(1,1,Nsim=5,Dfactor,flag_ASE=1,flag_DW=0)    # Please choose simulation specifications
 result$ASE
 #########
 #> result$ASE
 #             [,1]         [,2]
-#[1,] 0.0356719037 0.0193232577
-#[2,] 0.0382539704 0.0174810011
-#[3,] 0.0009478236 0.0005074364
+#[1,] 0.0349699180 0.0196316527
+#[2,] 0.0390863490 0.0187237132
+#[3,] 0.0009062008 0.0005047005
 
 
 

@@ -1,10 +1,11 @@
 
 
-sim1 = function(casem, cases, Nsim, Dfactor, tvcov,flag_ASE=1,flag_DW=0)
+sim1 = function(casem, cases, Nsim, Dfactor, flag_ASE=1,flag_DW=0)
 {
 tt = proc.time()
 
-np = 0
+np = 0  # no pre/pro-sequence padding 
+tvcov = 1 # always choose time-varying innovation covariance
 
 ## MS bic   2  aic 5  995
 ##### simulate a bivariate series of N
