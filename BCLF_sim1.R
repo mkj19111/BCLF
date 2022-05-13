@@ -11,7 +11,7 @@ setwd('D:/Git/BCLF')   # Please specify the working directory
 source("./Bayesian_lattice/utility.r")
 source("./Bayesian_lattice/MBayesLattice.r")
 source("./Bayesian_lattice/MdynamicLik.r")
-source("./Bayesian_lattice/tvar_spec_Guo.r")
+source("./Bayesian_lattice/tvar_spectrum.r")
 source("./Bayesian_lattice/sim1.r")
 
 

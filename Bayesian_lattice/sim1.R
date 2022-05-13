@@ -50,7 +50,7 @@ if (flag_ASE == 1){
   times <- 1:N
  # freqs <- c(0,seq(0,0.49,by=0.01)+0.001,0.5)
   freqs <- seq(0.001,0.499,by=0.01)
-  tspec <- tvar_spec_Guo(A0, S0, times, freqs)
+  tspec <- tvar_spec(A0, S0, times, freqs)
   tch = abs(tspec[1,2,,])^2/(abs(tspec[1,1,,])*abs(tspec[2,2,,]))
 }
 
@@ -150,7 +150,7 @@ if(flag_ASE == 1){
   A_m[1:P_sel[iter],,,,iter] =  para$A
   S_m[,,,iter] =  para$S
 
-  spec <- tvar_spec_Guo(para$A, para$S, 1:N, freqs)
+  spec <- tvar_spec(para$A, para$S, 1:N, freqs)
   TT = 3:1022
   sp1 = log(abs(spec[1,1,,TT]))
   sp2 = log(abs(spec[2,2,,TT]))
