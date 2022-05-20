@@ -5,8 +5,6 @@ rm(list = ls())
 library("fields")
 library("mvtnorm")
 
-setwd('D:/Git/BCLF')   # Please specify the working directory
-
 # load R functions
 source("./Bayesian_lattice/utility.r")
 source("./Bayesian_lattice/MBayesLattice.r")
@@ -14,21 +12,29 @@ source("./Bayesian_lattice/MdynamicLik.r")
 source("./Bayesian_lattice/tvar_spectrum.r")
 source("./Bayesian_lattice/sim1.r")
 
-
+############################################
+#  run simulation 1 of Sui(2022)
+#  sim1(casem, cases, Nsim, Dfactor,flag_ASE, flag_DW) 
+#  -----
+#  Arguments: 
+#  casem     1,2,3  case of autoregressive coefficients.
+#  cases     1,2    case of innovation covariance.
+#  Nsim      number of simulation datasets.
+#  Dfactor   a sequence of values of discount factor.
+#  flag_ASE  1 if ASE is computed, 0 otherwise.
+#  flag_DW   1 if DIC and WAIC is computed, 0 otherwise.
+#  -----
+#  See readme for more details
+############################################
 Dfactor = c(0.990,1,0.001)
 set.seed(20000)
-result=sim1(1,1,Nsim=5,Dfactor,flag_ASE=1,flag_DW=0)    # Please choose simulation specifications
+result=sim1(1,1,Nsim=500,Dfactor,flag_ASE=1,flag_DW=0)  
 result$ASE
-#########
-#> result$ASE
-#             [,1]         [,2]
-#[1,] 0.0349699180 0.0196316527
-#[2,] 0.0390863490 0.0187237132
-#[3,] 0.0009062008 0.0005047005
 
 
-
-##########
+############################################
+# generate plots of parameter estimation   #
+############################################
 A0 = result$A0
 S0 = result$S0
 K=2
