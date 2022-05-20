@@ -32,9 +32,9 @@ result=sim1(1,1,Nsim=500,Dfactor,flag_ASE=1,flag_DW=0)
 result$ASE
 
 
-############################################
-# generate plots of parameter estimation   #
-############################################
+###################################
+# plots of parameter estimation   #
+###################################
 A0 = result$A0
 S0 = result$S0
 K=2
