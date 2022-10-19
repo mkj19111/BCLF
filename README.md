@@ -1,1 +1,1 @@
-# BCLF
+# Bayesian Circular Lattice Filters (BCLF)
